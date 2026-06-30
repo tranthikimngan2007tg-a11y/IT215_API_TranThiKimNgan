@@ -1,0 +1,29 @@
+stages:
+  - test
+  - deploy
+
+run_tests:
+  stage: test
+  image: python:3.11-slim
+  before_script:
+    - pip install -r requirements.txt
+  script:
+    - python -m pytest
+
+deploy_to_vps:
+  stage: deploy
+  only:
+    - main
+  tags:
+    - vps-deploy # Tag của GitLab Runner trên VPS của bạn
+  script:
+    # 1. Đồng bộ mã nguồn từ thư mục builds sang thư mục chạy thực tế
+    - rsync -av --delete --exclude 'venv/' --exclude '.git/' --exclude '.pytest_cache/' ./ /var/www/fastapi/
+    # 2. Di chuyển vào thư mục chạy thực tế
+    - cd /var/www/fastapi
+    # 3. Cập nhật môi trường ảo venv và cài đặt dependencies mới
+    - python3 -m venv venv
+    - ./venv/bin/pip install --upgrade pip
+    - ./venv/bin/pip install -r requirements.txt
+    # 4. Khởi động lại dịch vụ FastAPI Systemd trên VPS
+    - sudo systemctl restart fastapi.service

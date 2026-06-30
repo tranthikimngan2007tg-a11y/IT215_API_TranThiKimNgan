@@ -1,0 +1,21 @@
+stages:
+  - test
+  - deploy
+
+run_tests:
+  stage: test
+  image: python:3.11-slim
+  before_script:
+    - pip install -r requirements.txt
+  script:
+    - python -m pytest
+
+deploy_to_vps:
+  stage: deploy
+  only:
+    - main
+  tags:
+    - vps-deploy # Tag sẽ trùng với tag của GitLab Runner cấu hình trên VPS
+  script:
+    - docker compose down
+    - docker compose up -d --build
