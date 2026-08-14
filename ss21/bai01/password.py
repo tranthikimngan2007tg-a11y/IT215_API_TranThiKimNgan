@@ -1,0 +1,49 @@
+import bcrypt
+
+
+def hash_password(password: str) -> str:
+    """
+    Băm mật khẩu bằng Bcrypt.
+    Mỗi lần gọi sẽ tạo salt mới nên hash có thể khác nhau.
+    """
+    password_bytes = password.encode("utf-8")
+
+    hashed = bcrypt.hashpw(
+        password_bytes,
+        bcrypt.gensalt()
+    )
+
+    return hashed.decode("utf-8")
+
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """
+    Kiểm tra mật khẩu gốc có khớp với mật khẩu đã băm hay không.
+    """
+    plain_password_bytes = plain_password.encode("utf-8")
+    hashed_password_bytes = hashed_password.encode("utf-8")
+
+    return bcrypt.checkpw(
+        plain_password_bytes,
+        hashed_password_bytes
+    )
+
+
+# Dữ liệu kiểm thử
+password = "Rikkei@123"
+
+hashed_password = hash_password(password)
+
+print("Hashed password:", hashed_password)
+print(
+    verify_password(
+        "Rikkei@123",
+        hashed_password
+    )
+)
+print(
+    verify_password(
+        "Rikkei@456",
+        hashed_password
+    )
+)
