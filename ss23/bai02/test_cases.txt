@@ -1,0 +1,33 @@
+TEST CASE THỰC HÀNH
+
+1. User xóa khóa học
+DELETE /admin/courses/1
+Authorization: Bearer user-token
+Expected: 403 Forbidden
+
+2. Admin xóa khóa học
+DELETE /admin/courses/1
+Authorization: Bearer admin-token
+Expected: 200 OK
+
+3. Locked user xem khóa học
+GET /courses
+Authorization: Bearer locked-token
+Expected: 403 Forbidden
+
+4. Health check
+GET /health
+No Authorization header
+Expected: 200 OK
+
+5. CORS preflight hợp lệ
+OPTIONS /courses
+Origin: http://localhost:5173
+Access-Control-Request-Method: GET
+Expected: không bị 401 và có Access-Control-Allow-Origin phù hợp.
+
+6. Origin không được phép
+OPTIONS /courses
+Origin: https://unknown-website.com
+Access-Control-Request-Method: GET
+Expected: không có Access-Control-Allow-Origin cho origin này.

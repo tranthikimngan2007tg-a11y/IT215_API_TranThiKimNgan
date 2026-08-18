@@ -1,0 +1,29 @@
+# Lỗi 1: Điều kiện phân quyền trong require_admin() bị sai.
+# Code cũ dùng:
+# if current_user["role"] == "admin" or current_user["is_active"]:
+# Điều kiện OR khiến user bình thường nhưng đang active vẫn được cấp quyền xóa.
+# Cách sửa: chỉ cho phép role == "admin".
+
+# Lỗi 2: authentication_middleware yêu cầu Authorization cho mọi request.
+# Điều này làm /health dù là endpoint công khai vẫn trả 401 khi không có token.
+# Cách sửa: loại trừ /health khỏi authentication middleware.
+
+# Lỗi 3: Middleware yêu cầu Authorization trước cả request OPTIONS.
+# Trình duyệt thường gửi OPTIONS để thực hiện CORS preflight.
+# Nếu thiếu Authorization mà middleware trả 401 ngay thì preflight bị chặn.
+# Cách sửa: cho OPTIONS đi qua mà không yêu cầu JWT.
+
+# Lỗi 4: allow_origins=["*"] cho phép mọi website gửi request CORS.
+# Điều này trái với yêu cầu chỉ cho phép 2 frontend đã quy định.
+# Cách sửa: cấu hình rõ 2 origin:
+# http://localhost:3000
+# http://localhost:5173
+
+# Quy tắc cuối cùng:
+# - admin-token xóa khóa học: 200 OK
+# - user-token xóa khóa học: 403 Forbidden
+# - locked-token gọi API bảo vệ: 403 Forbidden
+# - /health không cần đăng nhập: 200 OK
+# - OPTIONS không bị authentication middleware chặn
+# - website lạ không được cấp Access-Control-Allow-Origin
+# - response có X-System-Name: Learning Management System

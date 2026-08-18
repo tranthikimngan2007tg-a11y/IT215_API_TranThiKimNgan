@@ -1,0 +1,71 @@
+MEGAMART ERP - KỊCH BẢN KIỂM THỬ
+
+1. STAFF truy cập system settings
+Request:
+GET /api/v1/system/settings
+X-User-Role: STAFF
+
+Expected:
+403 Forbidden
+{"error":"Permission Denied"}
+
+2. ADMIN truy cập system settings
+Request:
+GET /api/v1/system/settings
+X-User-Role: ADMIN
+
+Expected:
+200 OK
+
+3. HR truy cập salary
+Request:
+GET /api/v1/salary/modify
+X-User-Role: HR
+
+Expected:
+200 OK
+
+4. STAFF truy cập salary
+Request:
+GET /api/v1/salary/modify
+X-User-Role: STAFF
+
+Expected:
+403 Forbidden
+
+5. STAFF truy cập profile
+Request:
+GET /api/v1/profile
+X-User-Role: STAFF
+
+Expected:
+200 OK
+
+6. Thiếu X-User-Role trên API bảo vệ
+Request:
+GET /api/v1/system/settings
+
+Expected:
+403 Forbidden
+{"error":"Permission Denied"}
+
+7. Origin hợp lệ
+Origin: https://internal.megamart.com
+
+Expected:
+Có Access-Control-Allow-Origin phù hợp.
+
+8. Origin không hợp lệ
+Origin: https://evil-attacker.xyz
+
+Expected:
+Không có Access-Control-Allow-Origin cho evil-attacker.xyz.
+
+9. CORS preflight hợp lệ
+OPTIONS /api/v1/profile
+Origin: https://internal.megamart.com
+Access-Control-Request-Method: GET
+Access-Control-Request-Headers: X-User-Role
+
+Expected:
+Preflight không bị RBAC trả 403; CORSMiddleware xử lý request.

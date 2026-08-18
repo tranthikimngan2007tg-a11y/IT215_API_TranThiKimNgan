@@ -1,0 +1,17 @@
+1. RBAC tập trung:
+Middleware đọc X-User-Role và tra cứu ROLE_RULES để xác định endpoint yêu cầu role nào.
+Nếu role không thuộc danh sách được phép, request bị chặn ngay tại middleware và trả 403 với JSON {"error":"Permission Denied"}.
+
+2. Không tin trực tiếp tất cả request:
+Role chỉ đang được giả lập bằng X-User-Role theo yêu cầu bài tập. Trong hệ thống thực tế, role phải lấy từ JWT/session đã xác thực.
+
+3. Không chặn OPTIONS:
+CORS preflight dùng phương thức OPTIONS. Middleware RBAC phải bỏ qua OPTIONS để CORSMiddleware xử lý, nếu không trình duyệt sẽ nhận 403 trước khi kiểm tra CORS.
+
+4. CORS nghiêm ngặt:
+Không sử dụng allow_origins=["*"]. Chỉ cho phép https://internal.megamart.com, methods GET/POST và headers Content-Type/X-User-Role.
+
+5. Test quan trọng:
+- STAFF -> /api/v1/system/settings: 403
+- ADMIN -> /api/v1/system/settings: 200
+- Origin evil-attacker.xyz: không có Access-Control-Allow-Origin hợp lệ

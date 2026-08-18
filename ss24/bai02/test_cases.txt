@@ -1,0 +1,49 @@
+FLASHMOVE - TEST CASES
+
+TC01 - DRIVER gọi POST /api/v1/orders/assign
+Header:
+X-Role-Identity: DRIVER
+Expected: 403 Forbidden
+Expected body:
+{"status":"Rejected","reason":"Unauthorized action for this role"}
+
+TC02 - DISPATCHER gọi POST /api/v1/orders/assign
+Header:
+X-Role-Identity: DISPATCHER
+Expected: 200 OK
+
+TC03 - DRIVER gọi PATCH /api/v1/orders/status
+Header:
+X-Role-Identity: DRIVER
+Expected: 200 OK
+
+TC04 - CUSTOMER_SUPPORT gọi PATCH /api/v1/orders/status
+Header:
+X-Role-Identity: CUSTOMER_SUPPORT
+Expected: 403 Forbidden
+
+TC05 - CUSTOMER_SUPPORT gọi GET /api/v1/orders/track
+Header:
+X-Role-Identity: CUSTOMER_SUPPORT
+Expected: 200 OK
+
+TC06 - CORS origin hợp lệ
+Origin: https://driver.flashmove.io
+Expected: Có Access-Control-Allow-Origin tương ứng.
+
+TC07 - CORS origin hợp lệ
+Origin: https://hub.flashmove.io
+Expected: Có Access-Control-Allow-Origin tương ứng.
+
+TC08 - CORS origin không hợp lệ
+Origin: https://evil-competitor.com
+Expected: Không có Access-Control-Allow-Origin cho origin này.
+
+TC09 - Origin localhost không whitelist
+Origin: http://localhost:3000
+Expected: Không có Access-Control-Allow-Origin.
+
+TC10 - OPTIONS preflight từ domain hợp lệ
+Origin: https://driver.flashmove.io
+Access-Control-Request-Method: GET
+Expected: Preflight không bị custom RBAC middleware chặn.

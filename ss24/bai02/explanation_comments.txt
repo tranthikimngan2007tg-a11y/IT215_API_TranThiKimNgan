@@ -1,0 +1,44 @@
+# 1. RBAC tập trung
+Quy tắc quyền được gom vào ROLE_RULES thay vì viết lặp lại ở từng endpoint.
+
+# 2. Header X-Role-Identity
+Middleware đọc vai trò từ header:
+X-Role-Identity
+
+Ví dụ:
+X-Role-Identity: DRIVER
+
+# 3. Khi role không hợp lệ
+Middleware trả:
+HTTP 403
+
+Body:
+{
+  "status": "Rejected",
+  "reason": "Unauthorized action for this role"
+}
+
+# 4. OPTIONS / CORS preflight
+OPTIONS được bỏ qua kiểm tra RBAC để CORSMiddleware xử lý CORS preflight.
+
+# 5. CORS whitelist
+Chỉ cho phép:
+- https://driver.flashmove.io
+- https://hub.flashmove.io
+
+Không dùng allow_origins=["*"].
+
+# 6. HTTP methods
+Chỉ:
+- GET
+- POST
+- PATCH
+
+# 7. Headers
+Chỉ:
+- Content-Type
+- X-Role-Identity
+
+# 8. Response header
+Các response đi qua middleware được gắn:
+X-System-Name: FlashMove Logistics
